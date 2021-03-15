@@ -24,6 +24,7 @@ export class UserController {
         pass: process.env.EMAIL,
       },
     });
+
     this.userService
       .create(body)
       .then((user) => {
@@ -58,7 +59,7 @@ export class UserController {
     try {
       const { user_id } = this.jwtService.verify(params.token);
 
-      res.redirect('http://localhost:3000/register/' + user_id);
+      res.redirect('http://localhost:3001/register/' + user_id);
     } catch {
       res.send('access denied');
     }
@@ -67,7 +68,7 @@ export class UserController {
   @Put('/register/:id')
   async registerUser(
     @Param() params,
-    @Body() body: { password: string },
+    @Body() body: UserDto,
     @Res() res: Response,
   ) {
     const salt = await bcrypt.genSalt(10);

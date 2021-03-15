@@ -11,6 +11,7 @@ import {
   UploadedFile,
   Delete,
 } from '@nestjs/common';
+import { userDto } from './dto';
 import { StudentService } from './student.service';
 import { Response, Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -24,7 +25,7 @@ export class StudentController {
   @UseInterceptors(FileInterceptor('resume'))
   create(
     @UploadedFile() file: Express.Multer.File,
-    @Req() req: Request,
+    @Body() body: userDto,
     @Res() res: Response,
   ) {
     var fs = require('fs');
@@ -32,16 +33,18 @@ export class StudentController {
     fs.rename(
       join(__dirname, '..', '..', file.path),
       join(__dirname, '..', '..', file.path + '.pdf'),
-      (err) => console.log(err),
+      (err) => {
+        if (err) console.log(err);
+      },
     );
 
     const { filename } = file;
 
-    req.body.resume = '/upload/' + filename + '.pdf';
-    req.body.fullName = req.body.firstName + ' ' + req.body.lastName;
+    body.resume = '/upload/' + filename + '.pdf';
+    body.fullName = body.firstName + ' ' + body.lastName;
 
     this.studentService
-      .create(req.body)
+      .create(body)
       .then((result) => {
         res.status(200).send(result);
       })
@@ -107,7 +110,7 @@ export class StudentController {
   @UseInterceptors(FileInterceptor('resume'))
   edit(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { resume: string },
+    @Body() body: userDto,
     @Res() res: Response,
     @Req() req: Request,
   ) {
@@ -117,7 +120,9 @@ export class StudentController {
       fs.rename(
         join(__dirname, '..', '..', file.path),
         join(__dirname, '..', '..', file.path + '.pdf'),
-        (err) => console.log(err),
+        (err) => {
+          if (err) console.log(err);
+        },
       );
 
       const { filename } = file;
