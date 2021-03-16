@@ -1,11 +1,20 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import loader from '../loader.gif';
-import { useHistory, useParams, useLocation, Link } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import {
+  useHistory,
+  useParams,
+  useLocation,
+  Link,
+  Redirect,
+} from 'react-router-dom';
 import Modal from 'react-modal';
 import StudentModal from './modals/StudentModal';
 import StudentEditModal from './modals/StudentEditModal';
 import StudentResume from './modals/StudentResume';
+import { login, selectUser } from '../slices/user';
+import { useDispatch } from 'react-redux';
 
 interface IStudents {
   _id: String;
@@ -29,12 +38,42 @@ const StudentList = () => {
   const [searchload, setsearchload] = useState(false);
 
   const params = useParams();
+  const dispatch = useDispatch();
   const history = useHistory();
   const query = new URLSearchParams(useLocation().search);
   const page = Number(query.get('page'));
   const searchQuery = query.get('search');
+  const currentUser = useSelector(selectUser);
+  const authorization = window.localStorage.getItem('authorization');
 
   useEffect(() => {
+    if (!authorization) {
+      history.replace('/');
+      return;
+    } else {
+      axios
+        .post(
+          '/api/user/login',
+          {},
+          { headers: { authorization: authorization } },
+        )
+        .then((res: any) => {
+          let { user } = res.data;
+          if (user) {
+            dispatch(
+              login({
+                email: user.email,
+                role: user.role,
+                isLogged: true,
+              }),
+            );
+          } else {
+            history.replace('/');
+            return;
+          }
+        });
+    }
+
     if (searchQuery) {
       history.replace('/admin/student?page=1');
       axios.get('http://localhost:3001/api/student/1').then((res: any) => {

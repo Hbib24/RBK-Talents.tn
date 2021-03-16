@@ -1,9 +1,8 @@
 export class UserDto {
+  _id: string;
+  username: string;
   email: string;
   password: string;
-}
-
-export class LoginDto {
-  email: string;
-  password: string;
+  role: string;
+  status: string;
 }

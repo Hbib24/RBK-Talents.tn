@@ -1,7 +1,7 @@
 import { User, UserDocument } from './user.model';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { UserDto, LoginDto } from './dto';
+import { UserDto } from './dto';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 
@@ -15,10 +15,7 @@ export class UserService {
     return promise;
   }
 
-  async login(attempt: LoginDto) {
-    if (!attempt.email || !attempt.password) return { message: 'missing data' };
-
-    // fetching user
+  async login(attempt: UserDto) {
     let user = await this.userModel.findOne({ email: attempt.email });
 
     if (!user) return { message: 'user does not exist', exists: false };
@@ -27,7 +24,12 @@ export class UserService {
     let isValid = await bcrypt.compare(attempt.password, user.password);
 
     if (isValid) {
-      return { user: { role: user.role, email: user.email } };
+      return {
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        _id: user._id,
+      };
     }
     return { message: 'password is not valid', exists: true };
   }
@@ -46,6 +48,11 @@ export class UserService {
       password: pass,
       status: 'ACTIVE',
     });
+    return promise;
+  }
+
+  async getOne(id: string) {
+    let promise = await this.userModel.findOne({ _id: id });
     return promise;
   }
 }

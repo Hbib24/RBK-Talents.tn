@@ -12,7 +12,6 @@ function LoginForm() {
   const [isLoading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
-  const currentUser = useSelector(selectUser);
   const history = useHistory();
 
   var submit = (e: any) => {
@@ -24,15 +23,16 @@ function LoginForm() {
       method: 'POST',
       data: { email: email, password: password },
     }).then((res) => {
-      let user = res.data.user;
+      let { user } = res.data;
       if (user) {
         dispatch(
           login({
             email: user.email,
             role: user.role,
             isLogged: true,
-          })
+          }),
         );
+        window.localStorage.setItem('authorization', res.headers.authtoken);
         history.push('/admin/student?page=1');
       } else {
         if (res.data.exists) {
@@ -59,34 +59,34 @@ function LoginForm() {
         padding: '50px',
         fontSize: '20px',
       }}
-      className='h-auto grid-rows-1 shadow-xl forms'
+      className="h-auto grid-rows-1 shadow-xl forms"
     >
       <h2
         style={{ textAlign: 'center', marginBottom: '30px' }}
-        className='text-4xl '
+        className="text-4xl "
       >
         Login
       </h2>
-      <form id='form' onSubmit={(e) => submit(e)}>
-        <label htmlFor='email'>Email</label>
+      <form id="form" onSubmit={(e) => submit(e)}>
+        <label htmlFor="email">Email</label>
         <br />
         <input
-          className='loginFormInput'
-          type='text'
-          name='email'
+          className="loginFormInput"
+          type="text"
+          name="email"
           onChange={(e: any) => setEmail(e.target.value)}
         />
         <br />
-        <label htmlFor='password'>Password</label>
+        <label htmlFor="password">Password</label>
         <br />
         <input
-          className='loginFormInput'
-          type='password'
-          name='password'
+          className="loginFormInput"
+          type="password"
+          name="password"
           onChange={(e: any) => setPassword(e.target.value)}
         />
         <br />
-        <button className='submit' type='submit' disabled={isLoading}>
+        <button className="submit" type="submit" disabled={isLoading}>
           Login
         </button>
       </form>

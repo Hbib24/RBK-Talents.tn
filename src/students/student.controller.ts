@@ -11,7 +11,7 @@ import {
   UploadedFile,
   Delete,
 } from '@nestjs/common';
-import { userDto } from './dto';
+import { StudentDto } from './dto';
 import { StudentService } from './student.service';
 import { Response, Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -25,7 +25,7 @@ export class StudentController {
   @UseInterceptors(FileInterceptor('resume'))
   create(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: userDto,
+    @Body() body: StudentDto,
     @Res() res: Response,
   ) {
     var fs = require('fs');
@@ -110,7 +110,7 @@ export class StudentController {
   @UseInterceptors(FileInterceptor('resume'))
   edit(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: userDto,
+    @Body() body: StudentDto,
     @Res() res: Response,
     @Req() req: Request,
   ) {

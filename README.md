@@ -9,3 +9,4 @@ to run this application:
 * Reactjs typescript 
 * react-redux
 * Nest.js
+* MongoDB

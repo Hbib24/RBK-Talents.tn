@@ -16,12 +16,12 @@ function App() {
   return (
     <Router>
       <Provider store={store}>
-        <div className='App' id='main'>
+        <div className="App" id="main">
           <Switch>
-            <Route path='/' exact component={LoginForm} />
-            <Route path='/admin/student' component={StudentList} />
-            <Route path='/admin/company' component={CompanyList} />
-            <Route path='/register/:user_id' component={AccountRegistration} />
+            <Route path="/" exact component={LoginForm} />
+            <Route path="/admin/student" component={StudentList} />
+            <Route path="/admin/company" component={CompanyList} />
+            <Route path="/register/:user_id" component={AccountRegistration} />
           </Switch>
         </div>
       </Provider>

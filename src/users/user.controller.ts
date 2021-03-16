@@ -1,8 +1,17 @@
 import { JwtService } from '@nestjs/jwt';
-import { UserDto, LoginDto } from './dto';
-import { Controller, Get, Post, Body, Res, Put, Param } from '@nestjs/common';
+import { UserDto } from './dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Res,
+  Put,
+  Param,
+  Req,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import * as bcrypt from 'bcrypt';
 require('dotenv').config();
 
@@ -84,10 +93,33 @@ export class UserController {
   }
 
   @Post('/login')
-  login(@Body() body: LoginDto, @Res() res: Response) {
-    this.userService.login(body).then((result) => {
-      res.send(result);
-    });
+  login(@Body() body: UserDto, @Res() res: Response, @Req() req: Request) {
+    const { authorization } = req.headers;
+
+    if (authorization) {
+      try {
+        const { user_id } = this.jwtService.verify(authorization);
+        this.userService
+          .getOne(user_id)
+          .then((result) => {
+            res.status(200).send({ user: result });
+          })
+          .catch((e) => res.send(e));
+      } catch (e) {
+        res.status(400).send({ err: e });
+      }
+    } else {
+      if (!body.email || !body.password) {
+        res.status(400).send({ message: 'missing data' }).end();
+      }
+
+      this.userService.login(body).then((result: any) => {
+        const authToken = this.jwtService.sign({
+          user_id: result._id,
+        });
+        res.status(200).header({ authToken: authToken }).send({ user: result });
+      });
+    }
   }
 
   @Get('/company')
